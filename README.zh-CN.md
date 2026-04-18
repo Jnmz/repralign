@@ -2,7 +2,7 @@
 
 # repralign
 
-[![PyPI version](https://img.shields.io/pypi/v/repralign)](https://pypi.org/project/repralign/)
+[![PyPI version](https://img.shields.io/pypi/v/repralign.svg)](https://pypi.org/project/repralign/)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
