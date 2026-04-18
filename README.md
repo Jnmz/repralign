@@ -1,8 +1,14 @@
+[English](README.md) | [中文](README.zh-CN.md)
+
 # repralign
+
+[![PyPI version](https://img.shields.io/pypi/v/repralign)](https://pypi.org/project/repralign/)
+[![Python](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/)
+[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 `repralign` is a small, reusable Python toolkit for layer-wise representation alignment analysis in PyTorch and multimodal research workflows. It is designed for experiments where you want to compare intermediate features from one model against one or more reference models, compute similarity curves across layers, and save clean artifacts for later inspection.
 
-The project is inspired by the general workflow shown in the attached paper screenshot: compare a candidate model against different reference models, inspect how alignment evolves across layers, and summarize the result with publication-style figures. It does **not** claim to reproduce the paper authors' private implementation, hidden internals, or unpublished code.
+The project follows a paper-inspired analysis workflow: compare a candidate model against different reference models, inspect how alignment evolves across layers, and summarize the result with publication-style figures. It is designed as a generic, configurable research toolkit for reusable alignment studies.
 
 ## Motivation
 
@@ -16,13 +22,27 @@ Many multimodal papers reason about whether a learned representation behaves mor
 
 ## Installation
 
+Install from PyPI:
+
+```bash
+pip install repralign
+```
+
+Install with optional Hugging Face support:
+
+```bash
+pip install "repralign[huggingface]"
+```
+
+Install from source for local development:
+
 ```bash
 python -m venv .venv
 source .venv/bin/activate
 pip install -e .[dev]
 ```
 
-Optional Hugging Face support:
+For local development with optional Hugging Face support:
 
 ```bash
 pip install -e .[dev,huggingface]
@@ -132,21 +152,20 @@ repralign plot \
 ```python
 from repralign.adapters.generic_torch import GenericTorchAdapter
 from repralign.extract import extract_feature_dict
-from repralign.metrics import compute_metric
-from repralign.pooling import apply_pooling
+from repralign.metrics import linear_cka
 
 adapter = GenericTorchAdapter(model, layer_names=["encoder.layers.0", "encoder.layers.1"])
-raw = extract_feature_dict(adapter=adapter, batch=batch, pooling="mean_tokens")
-score = compute_metric("cka", raw["encoder.layers.0"], raw["encoder.layers.1"])
+features = extract_feature_dict(adapter=adapter, batch=batch, pooling="mean_tokens")
+score = linear_cka(features["encoder.layers.0"], features["encoder.layers.1"])
 ```
 
 ## YAML Configs
 
 The v0.1 CLI uses explicit YAML configuration so model factories, layer names, input tensors, pooling, and output directories are visible in one place. See [configs/example_analysis.yaml](/Users/jnmz/Desktop/code/repralign/configs/example_analysis.yaml) for a runnable example.
 
-## Screenshot-Inspired Workflow
+## Paper-Inspired Workflow
 
-The attached screenshot should be treated as inspiration for:
+This repository uses published paper-style analysis structure as inspiration for:
 
 - comparing a candidate model against more than one reference model
 - organizing figures as layer-wise similarity curves
