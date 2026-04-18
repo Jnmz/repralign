@@ -1,0 +1,37 @@
+candidate:
+  name: candidate
+  adapter: generic_torch
+  factory: examples.model_factories:build_toy_candidate
+  layers:
+    - layers.0
+    - layers.1
+    - layers.2
+    - layers.3
+    - layers.4
+    - layers.5
+
+references:
+  - name: semantic_reference
+    adapter: generic_torch
+    factory: examples.model_factories:build_toy_semantic_reference
+    layers:
+      - layers.0
+      - layers.1
+      - layers.2
+      - layers.3
+  - name: generation_reference
+    adapter: generic_torch
+    factory: examples.model_factories:build_toy_generation_reference
+    layers:
+      - layers.0
+      - layers.1
+      - layers.2
+      - layers.3
+
+extract:
+  pooling: mean_tokens
+  normalize: true
+  batch_path: configs/example_batch.pt
+
+outputs:
+  directory: outputs/from_config
