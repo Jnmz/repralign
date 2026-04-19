@@ -7,7 +7,6 @@ repo_name: Jnmz/repralign
 theme:
   name: material
   features:
-    - navigation.instant
     - navigation.sections
     - navigation.expand
     - content.code.copy
@@ -15,6 +14,7 @@ theme:
     - scheme: default
       primary: blue
       accent: indigo
+  language: en
 
 markdown_extensions:
   - admonition
@@ -22,6 +22,19 @@ markdown_extensions:
   - pymdownx.superfences
   - pymdownx.inlinehilite
   - tables
+
+plugins:
+  - search
+  - i18n:
+      docs_structure: folder
+      languages:
+        - locale: en
+          default: true
+          name: English
+          build: true
+        - locale: zh
+          name: 中文
+          build: true
 
 nav:
   - Home: index.md
