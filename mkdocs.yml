@@ -1,0 +1,44 @@
+site_name: repralign
+site_description: Reusable layer-wise representation alignment analysis for multimodal models.
+site_url: https://jnmz.github.io/repralign/
+repo_url: https://github.com/Jnmz/repralign
+repo_name: Jnmz/repralign
+
+theme:
+  name: material
+  features:
+    - navigation.instant
+    - navigation.sections
+    - navigation.expand
+    - content.code.copy
+  palette:
+    - scheme: default
+      primary: blue
+      accent: indigo
+
+markdown_extensions:
+  - admonition
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - pymdownx.inlinehilite
+  - tables
+
+nav:
+  - Home: index.md
+  - Getting Started:
+      - Installation: getting-started/installation.md
+      - Concepts: getting-started/concepts.md
+      - Limitations: getting-started/limitations.md
+  - Guides:
+      - CLI Workflow: guides/cli-workflow.md
+      - YAML Configs: guides/yaml-configs.md
+      - Dataset Inputs: guides/datasets.md
+      - Layer Discovery: guides/layer-discovery.md
+      - Reference Models: guides/reference-models.md
+      - Outputs: guides/outputs.md
+      - Python API: guides/python-api.md
+  - Tutorials:
+      - Minimal Comparison: tutorials/minimal-compare.md
+      - Paper-Inspired Analysis: tutorials/paper-inspired-analysis.md
+      - Real Image Folder Workflow: tutorials/real-image-workflow.md
+  - Troubleshooting: troubleshooting.md
