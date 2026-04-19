@@ -6,4 +6,4 @@ from repralign.registry import create_adapter, compute_metric
 
 __all__ = ["apply_pooling", "compute_metric", "create_adapter", "extract_feature_dataset", "extract_feature_dict"]
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"

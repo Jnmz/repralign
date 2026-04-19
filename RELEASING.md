@@ -36,7 +36,7 @@ python3 -m twine check dist/*
 ## Publish A Release
 
 1. Commit and push the release changes to `main`.
-2. Create a Git tag that matches the release version, for example `v0.1.0`.
+2. Create a Git tag that matches the release version, for example `v0.1.1`.
 3. Create and publish a GitHub release for that tag.
 4. GitHub Actions will run `.github/workflows/publish.yml`.
 5. On the first successful upload, PyPI will create the project and attach the trusted publisher.
