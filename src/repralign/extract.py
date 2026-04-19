@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from typing import Any, Optional, Union
 
 import torch
@@ -35,20 +36,24 @@ def extract_feature_dict(
     """
 
     if device is not None:
-        adapter.model.to(device)
-        batch = move_batch_to_device(batch, device)
+        adapter.move_to_device(device)
+
+    prepared_batch = adapter.prepare_batch(batch)
+    if device is not None:
+        prepared_batch = move_batch_to_device(prepared_batch, device)
 
     hooks = register_activation_hooks(
-        adapter.model,
+        adapter.get_hook_model(),
         adapter.layer_names,
         transform=adapter.transform_hook_output,
     )
-    was_training = adapter.model.training
-    adapter.model.eval()
+    hook_model = adapter.get_hook_model()
+    was_training = hook_model.training
+    hook_model.eval()
 
     try:
         with torch.no_grad():
-            adapter.forward(batch)
+            adapter.forward(prepared_batch)
         pooled: dict[str, torch.Tensor] = {}
         for layer_name in adapter.layer_names:
             layer_features = apply_pooling(hooks.activations[layer_name], pooling)
@@ -56,7 +61,34 @@ def extract_feature_dict(
         return pooled
     finally:
         hooks.remove()
-        adapter.model.train(was_training)
+        hook_model.train(was_training)
+
+
+def extract_feature_dataset(
+    adapter: BaseModelAdapter,
+    batches: Iterable[object],
+    pooling: PoolingMode,
+    normalize: bool = True,
+    device: Optional[Union[str, torch.device]] = None,
+) -> dict[str, torch.Tensor]:
+    """Extract pooled features across multiple batches and concatenate them."""
+
+    collected: dict[str, list[torch.Tensor]] = {layer_name: [] for layer_name in adapter.layer_names}
+    for batch in batches:
+        batch_features = extract_feature_dict(
+            adapter=adapter,
+            batch=batch,
+            pooling=pooling,
+            normalize=normalize,
+            device=device,
+        )
+        for layer_name, tensor in batch_features.items():
+            collected[layer_name].append(tensor.detach().cpu())
+
+    return {
+        layer_name: torch.cat(tensors, dim=0) if tensors else torch.empty((0, 0), dtype=torch.float32)
+        for layer_name, tensors in collected.items()
+    }
 
 
 def move_batch_to_device(batch: Any, device: Union[str, torch.device]) -> Any:

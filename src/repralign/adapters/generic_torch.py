@@ -2,14 +2,28 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 import torch
-from torch import nn
 
 from repralign.adapters.base import BaseModelAdapter
+from repralign.datasets import batch_to_images
 
 
 class GenericTorchAdapter(BaseModelAdapter):
     """Generic adapter where the caller controls model inputs and layer names."""
+
+    def prepare_batch(self, batch: object) -> object:
+        if self.processor is None:
+            return batch
+
+        if isinstance(batch, dict):
+            return self.processor(**batch)
+        if isinstance(batch, (list, tuple)):
+            images = batch_to_images(batch)
+            if images is not None:
+                return self.processor(images=images, return_tensors="pt")
+        return self.processor(batch)
 
     def forward(self, batch: object) -> object:
         if isinstance(batch, dict):

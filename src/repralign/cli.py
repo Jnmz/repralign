@@ -9,7 +9,8 @@ from typing import Optional
 
 from repralign.cache import load_feature_cache, save_feature_cache
 from repralign.config import load_batch_tensor, load_yaml_config, resolve_factory
-from repralign.extract import extract_feature_dict
+from repralign.datasets import iter_batch_records, load_dataset_records
+from repralign.extract import extract_feature_dataset, extract_feature_dict
 from repralign.plotting import plot_csv_curves, write_similarity_csv
 from repralign.registry import compute_metric, create_adapter
 
@@ -44,21 +45,46 @@ def build_parser() -> argparse.ArgumentParser:
 
 def _run_extract(config_path: str) -> None:
     config = load_yaml_config(config_path)
-    batch = load_batch_tensor(config.extract.batch_path, batch_key=config.extract.batch_key)
     output_dir = Path(config.outputs.directory)
     output_dir.mkdir(parents=True, exist_ok=True)
 
     all_specs = [config.candidate, *config.references]
     for spec in all_specs:
         factory = resolve_factory(spec.factory)
-        model = factory()
-        adapter = create_adapter(spec.adapter, model=model, layer_names=spec.layers)
-        features = extract_feature_dict(
-            adapter=adapter,
-            batch=batch,
-            pooling=config.extract.pooling,
-            normalize=config.extract.normalize,
+        model = factory(**spec.factory_kwargs)
+
+        processor = None
+        if spec.processor_factory is not None:
+            processor_factory = resolve_factory(spec.processor_factory)
+            processor = processor_factory(**spec.processor_kwargs)
+
+        adapter = create_adapter(
+            spec.adapter,
+            model=model,
+            layer_names=spec.layers,
+            processor=processor,
+            adapter_kwargs=spec.adapter_kwargs,
         )
+
+        if config.dataset is not None:
+            records = load_dataset_records(config.dataset.__dict__)
+            batches = iter_batch_records(records, batch_size=config.dataset.batch_size)
+            features = extract_feature_dataset(
+                adapter=adapter,
+                batches=batches,
+                pooling=config.extract.pooling,
+                normalize=config.extract.normalize,
+                device=spec.device,
+            )
+        else:
+            batch = load_batch_tensor(config.extract.batch_path, batch_key=config.extract.batch_key)
+            features = extract_feature_dict(
+                adapter=adapter,
+                batch=batch,
+                pooling=config.extract.pooling,
+                normalize=config.extract.normalize,
+                device=spec.device,
+            )
         save_feature_cache(
             output_dir / f"{spec.name}_features.npz",
             features=features,
@@ -68,6 +94,7 @@ def _run_extract(config_path: str) -> None:
                 "layers": spec.layers,
                 "pooling": config.extract.pooling,
                 "normalize": config.extract.normalize,
+                "dataset": config.dataset.__dict__ if config.dataset is not None else None,
             },
         )
 

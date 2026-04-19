@@ -1,0 +1,68 @@
+# Template for running a real image-folder experiment with one semantic
+# reference and one generation-oriented reference.
+#
+# This file is intentionally a template: update model names, layer names,
+# image_root, and device settings for your hardware before running it.
+
+candidate:
+  name: candidate
+  adapter: generic_torch
+  factory: examples.model_factories:build_toy_candidate
+  layers:
+    - layers.0
+    - layers.1
+    - layers.2
+    - layers.3
+    - layers.4
+    - layers.5
+  factory_kwargs: {}
+  adapter_kwargs: {}
+  device: cpu
+
+references:
+  - name: semantic_reference
+    adapter: hf_vision
+    factory: repralign.factories:load_siglip_vision_model
+    processor_factory: repralign.factories:load_siglip_image_processor
+    factory_kwargs:
+      model_name: google/siglip-so400m-patch14-384
+    processor_kwargs:
+      model_name: google/siglip-so400m-patch14-384
+    layers:
+      - vision_model.encoder.layers.0
+      - vision_model.encoder.layers.1
+      - vision_model.encoder.layers.2
+    adapter_kwargs: {}
+    device: cpu
+
+  - name: generation_reference
+    adapter: sd3_reference
+    factory: repralign.factories:load_sd3_pipeline
+    factory_kwargs:
+      model_name: stabilityai/stable-diffusion-3-medium-diffusers
+      torch_dtype: float32
+      drop_t5: true
+    layers:
+      - transformer_blocks.0
+      - transformer_blocks.1
+      - transformer_blocks.2
+    adapter_kwargs:
+      height: 512
+      width: 512
+      timestep: 0
+      default_prompt: ""
+    device: cpu
+
+dataset:
+  type: image_folder
+  image_root: path/to/images
+  recursive: true
+  batch_size: 2
+  prompt: ""
+
+extract:
+  pooling: mean_tokens
+  normalize: true
+
+outputs:
+  directory: outputs/reference_alignment
