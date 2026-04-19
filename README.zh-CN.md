@@ -10,7 +10,7 @@
 
 文档网站：
 
-- `https://jnmz.github.io/repralign/`
+- [文档网站](https://jnmz.github.io/repralign/)
 
 ## 安装
 

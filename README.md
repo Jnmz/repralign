@@ -10,7 +10,7 @@
 
 Documentation:
 
-- Docs site: `https://jnmz.github.io/repralign/`
+- [Documentation site](https://jnmz.github.io/repralign/)
 
 ## Installation
 
