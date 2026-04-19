@@ -8,6 +8,10 @@
 
 `repralign` 是一个用于多模态模型分层表示对齐分析的可复用 Python 工具包。
 
+文档网站：
+
+- `https://jnmz.github.io/repralign/`
+
 ## 安装
 
 通过 PyPI 安装：

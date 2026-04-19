@@ -8,6 +8,10 @@
 
 `repralign` is a reusable Python toolkit for layer-wise representation alignment analysis in multimodal models.
 
+Documentation:
+
+- Docs site: `https://jnmz.github.io/repralign/`
+
 ## Installation
 
 Install from PyPI:
